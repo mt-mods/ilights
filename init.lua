@@ -1,6 +1,20 @@
-local light = {}
+-- Industrial lights mod by DanDuncombe
+-- License: CC-By-Sa
 
-light.types = {
+ilights = {}
+
+if minetest.get_modpath("unified_inventory") or not minetest.setting_getbool("creative_mode") then
+	ilights.expect_infinite_stacks = false
+else
+	ilights.expect_infinite_stacks = true
+end
+
+ilights.modpath = minetest.get_modpath("ilights")
+
+dofile(ilights.modpath.."/ownership.lua")
+dofile(ilights.modpath.."/lib_6d.lua")
+
+ilights.types = {
 	{"white",      "White"},
 	{"grey",       "Grey"},
 	{"black",      "Black"},
@@ -17,10 +31,12 @@ light.types = {
 	{"pink", "Pink", "pink"},
 	{"brown", "Brown", "brown"},
 }
-for _, row in ipairs(light.types) do
+for _, row in ipairs(ilights.types) do
 	local name = row[1]
 	local desc = row[2]
+
 	-- Node Definition
+
 	minetest.register_node("ilights:light_"..name, {
 	    drawtype = "nodebox",
 		description = desc.." Industrial Light",
@@ -44,14 +60,26 @@ for _, row in ipairs(light.types) do
 			    {-5/16,-5/16,-5/16,5/16,-4/16,5/16}, --Side Wire
 		    },
 	    },
+	on_place = function(itemstack, placer, pointed_thing)
+		if not ilights:node_is_owned(pointed_thing.under, placer) 
+		   and not ilights:node_is_owned(pointed_thing.above, placer) then
+			lib_6d:rotate_and_place(itemstack, placer, pointed_thing, ilights.expect_infinite_stacks)
+		end
+		return itemstack
+	end
 	})
+
 	if name then
+
 		--Choose craft material
 		minetest.register_craft({
-			output = "ilights:light_"..name.." 2",
+			output = "ilights:light_"..name.." 3",
 			recipe = {
-			{"dye:"..name},
-			{"default:torch"} },
+				{ "",                     "default:steel_ingot",  "" },
+				{ "dye:"..name,           "default:glass",        "dye:"..name },
+				{ "default:steel_ingot",  "default:torch",        "default:steel_ingot" }
+			},
 		})
+
 	end
 end
