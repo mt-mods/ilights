@@ -40,9 +40,9 @@ for _, row in ipairs(ilights.types) do
 	minetest.register_node("ilights:light_"..name, {
 	    drawtype = "nodebox",
 		description = desc.." Industrial Light",
-		tiles = {"ilight_"..name.."_top.png^ilight_top.png",
+		tiles = {"ilight_"..name..".png^ilight_top.png",
 		         "ilight_base.png",
-		         "ilight_"..name.."_side.png^ilight_side.png"},
+		         "ilight_"..name..".png^ilight_side.png"},
 		groups = {cracky=3},
 	    paramtype = "light",
 	    paramtype2 = "facedir",
