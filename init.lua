@@ -3,6 +3,8 @@
 
 ilights = {}
 
+ilights.intllib_modpath = minetest.get_modpath("intllib")
+
 if minetest.get_modpath("unified_inventory") or not minetest.setting_getbool("creative_mode") then
 	ilights.expect_infinite_stacks = false
 else
@@ -50,23 +52,31 @@ for _, row in ipairs(ilights.types) do
 	    node_box = {
 		    type = "fixed",
 		    fixed = {
-			    {-4/16,-7/16,-4/16,4/16,3/16,4/16}, --Bulb
-			    {-6/16,-8/16,-6/16,6/16,-7/16,6/16}, --Base
-			    {-3/16,-7/16,-5/16,-2/16,4/16,5/16}, --Wire
-			    {2/16,-7/16,-5/16,3/16,4/16,5/16}, --Wire
-			    {-5/16,-7/16,-3/16,5/16,4/16,-2/16}, --Wire
-			    {5/16,-7/16,2/16,-5/16,4/16,3/16}, --Wire
-			    {-5/16,0/16,-5/16,5/16,1/16,5/16}, --Side Wire
-			    {-5/16,-5/16,-5/16,5/16,-4/16,5/16}, --Side Wire
+			    { -4/16, -7/16, -4/16,  4/16,  3/16,  4/16 }, -- Bulb
+			    { -6/16, -8/16, -6/16,  6/16, -7/16,  6/16 }, -- Base
+
+			    { -3/16, -7/16, -9/32, -2/16,  7/32,  9/32 }, -- Wire
+			    {  2/16, -7/16, -9/32,  3/16,  7/32,  9/32 }, -- Wire
+			    { -9/32, -7/16, -3/16,  9/32,  7/32, -2/16 }, -- Wire
+			    {  9/32, -7/16,  2/16, -9/32,  7/32,  3/16 }, -- Wire
+
+			    { -9/32,  0/16, -9/32,  9/32,  1/16,  9/32 }, -- Side Wire
+			    { -9/32, -5/16, -9/32,  9/32, -4/16,  9/32 }  -- Side Wire
 		    },
 	    },
-	on_place = function(itemstack, placer, pointed_thing)
-		if not ilights:node_is_owned(pointed_thing.under, placer) 
-		   and not ilights:node_is_owned(pointed_thing.above, placer) then
-			lib_6d:rotate_and_place(itemstack, placer, pointed_thing, ilights.expect_infinite_stacks)
+
+		selection_box = {
+			type = "fixed",
+			fixed = { -6/16, -8/16, -6/16, 6/16, 7/32, 6/16 }
+		},
+
+		on_place = function(itemstack, placer, pointed_thing)
+			if not ilights:node_is_owned(pointed_thing.under, placer) 
+			   and not ilights:node_is_owned(pointed_thing.above, placer) then
+				lib_6d:rotate_and_place(itemstack, placer, pointed_thing, ilights.expect_infinite_stacks)
+			end
+			return itemstack
 		end
-		return itemstack
-	end
 	})
 
 	if name then

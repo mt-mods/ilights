@@ -1,5 +1,13 @@
 -- simple function to check for ownership of a node before placing it.
 
+local S
+if ilights.intllib_modpath then
+    dofile(ilights.intllib_modpath.."/intllib.lua")
+    S = intllib.Getter(minetest.get_current_modname())
+else
+    S = function ( s ) return s end
+end
+
 function ilights:node_is_owned(pos, placer)
 	local ownername = false
 	if type(IsPlayerNodeOwner) == "function" then					-- node_ownership mod
