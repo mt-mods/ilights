@@ -3,6 +3,8 @@
 
 ilights = {}
 
+ilights.intllib_modpath = minetest.get_modpath("intllib")
+
 if minetest.get_modpath("unified_inventory") or not minetest.setting_getbool("creative_mode") then
 	ilights.expect_infinite_stacks = false
 else
