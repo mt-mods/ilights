@@ -8,7 +8,7 @@ else
     S = function ( s ) return s end
 end
 
-function ilights:node_is_owned(pos, placer)
+function ilights.node_is_owned(pos, placer)
 	local ownername = false
 	if type(IsPlayerNodeOwner) == "function" then					-- node_ownership mod
 		if HasOwner(pos, placer) then						-- returns true if the node is owned
