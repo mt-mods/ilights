@@ -13,21 +13,6 @@ end
 
 ilights.modpath = minetest.get_modpath("ilights")
 
--- protection wrapper for 6d stuff
-
-function ilights.protect_and_rotate(itemstack, placer, pointed_thing)
-	if not ilights.node_is_owned(pointed_thing.under, placer) 
-	   and not ilights.node_is_owned(pointed_thing.above, placer) then
-		minetest.rotate_and_place(itemstack, placer, pointed_thing,
-			ilights.expect_infinite_stacks)
-	end
-	return itemstack
-end
-
--- other components
-
-dofile(ilights.modpath.."/ownership.lua")
-
 -- The important stuff!
 
 ilights.types = {
@@ -83,7 +68,7 @@ for _, row in ipairs(ilights.types) do
 			type = "fixed",
 			fixed = { -6/16, -8/16, -6/16, 6/16, 7/32, 6/16 }
 		},
-		on_place = ilights.protect_and_rotate
+		on_place = minetest.rotate_node
 	})
 
 	if name then
