@@ -57,9 +57,12 @@ for _, row in ipairs(ilights.types) do
 		mesh = "ilights_lamp.obj",
 		tiles = {
 			"ilights_lamp_base.png",
-			"ilights_lamp_lens.png^[colorize:"..colordef..":200",
-			"ilights_lamp_cage.png"
+			"ilights_lamp_cage.png",
+			"ilights_lamp_bulb.png^[colorize:"..colordef..":200",
+			"ilights_lamp_bulb_base.png",
+			"ilights_lamp_lens.png^[colorize:"..colordef.."20:75"
 		},
+		use_texture_alpha = true,
 		groups = {cracky=3},
 	    paramtype = "light",
 	    paramtype2 = "facedir",
