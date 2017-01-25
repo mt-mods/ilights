@@ -22,21 +22,21 @@ ilights.modpath = minetest.get_modpath("ilights")
 -- The important stuff!
 
 ilights.types = {
-	{"white",		"White",		"#ffffff" },
-	{"grey",		"Grey",			"#a0a0a0" },
-	{"black",		"Black",		"#000000" },
-	{"red",			"Red",			"#ff0000" },
-	{"yellow",		"Yellow",		"#ffff00" },
-	{"green",		"Green",		"#00ff00" },
-	{"cyan",		"Cyan",			"#00ffff" },
-	{"blue",		"Blue",			"#0000ff" },
-	{"magenta",		"Magenta",		"#ff00ff" },
-	{"orange",		"Orange",		"#ff8000" },
-	{"violet",		"Violet",		"#8000ff" },
-	{"dark_grey",	"Dark Grey",	"#404040" },
-	{"dark_green",	"Dark Green",	"#008000" },
-	{"pink",		"Pink",			"#ffb0ff" },
-	{"brown",		"Brown",		"#604000" },
+	{"white",		"White",		0xffffffff },
+	{"grey",		"Grey",			0xffa0a0a0 },
+	{"black",		"Black",		0xff000000 },
+	{"red",			"Red",			0xffff0000 },
+	{"yellow",		"Yellow",		0xffffff00 },
+	{"green",		"Green",		0xff00ff00 },
+	{"cyan",		"Cyan",			0xff00ffff },
+	{"blue",		"Blue",			0xff0000ff },
+	{"magenta",		"Magenta",		0xffff00ff },
+	{"orange",		"Orange",		0xffff8000 },
+	{"violet",		"Violet",		0xff8000ff },
+	{"dark_grey",	"Dark Grey",	0xff404040 },
+	{"dark_green",	"Dark Green",	0xff008000 },
+	{"pink",		"Pink",			0xffffb0ff },
+	{"brown",		"Brown",		0xff604000 },
 }
 
 local lamp_cbox = {
@@ -58,9 +58,9 @@ for _, row in ipairs(ilights.types) do
 		tiles = {
 			"ilights_lamp_base.png",
 			"ilights_lamp_cage.png",
-			"ilights_lamp_bulb.png^[colorize:"..colordef..":200",
+			{ name = "ilights_lamp_bulb.png", color = colordef },
 			"ilights_lamp_bulb_base.png",
-			"ilights_lamp_lens.png^[colorize:"..colordef.."20:75"
+			{ name = "ilights_lamp_lens.png", color = colordef }
 		},
 		use_texture_alpha = true,
 		groups = {cracky=3},
