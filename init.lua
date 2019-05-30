@@ -154,6 +154,7 @@ local lamp_cbox = {
 for _, onoff in ipairs({"on", "off"}) do
 
 	local light_source = (onoff == "on") and default.LIGHT_MAX or nil
+	local nici = (onoff == "off") and 1 or nil
 
 	minetest.register_node("ilights:light_"..onoff, {
 		description = "Industrial Light",
@@ -167,7 +168,7 @@ for _, onoff in ipairs({"on", "off"}) do
 			"ilights_lamp_lens_"..onoff..".png"
 		},
 		use_texture_alpha = true,
-		groups = {cracky=3, ud_param2_colorable = 1},
+		groups = {cracky=3, ud_param2_colorable = 1, not_in_creative_inventory = nici},
 		paramtype = "light",
 		paramtype2 = "colorwallmounted",
 		palette = "unifieddyes_palette_colorwallmounted.png",
