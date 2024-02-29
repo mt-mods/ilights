@@ -175,6 +175,7 @@ for _, onoff in ipairs({"on", "off"}) do
 		},
 		use_texture_alpha = "clip",
 		groups = {cracky=3, ud_param2_colorable = 1, not_in_creative_inventory = nici},
+		is_ground_content = false,
 		paramtype = "light",
 		paramtype2 = "colorwallmounted",
 		palette = "unifieddyes_palette_colorwallmounted.png",
