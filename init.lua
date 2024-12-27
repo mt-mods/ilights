@@ -4,6 +4,7 @@
 ilights = {}
 
 local S = minetest.get_translator(minetest.get_current_modname())
+local mat = xcompat.materials
 
 if minetest.get_modpath("unified_inventory") or not minetest.settings:get_bool("creative_mode") then
 	ilights.expect_infinite_stacks = false
@@ -159,7 +160,7 @@ local lamp_cbox = {
 
 for _, onoff in ipairs({"on", "off"}) do
 
-	local light_source = (onoff == "on") and default.LIGHT_MAX or nil
+	local light_source = (onoff == "on") and minetest.LIGHT_MAX or nil
 	local nici = (onoff == "off") and 1 or nil
 
 	minetest.register_node("ilights:light_"..onoff, {
@@ -203,9 +204,9 @@ minetest.register_alias("ilights:light", "ilights:light_on")
 minetest.register_craft({
 	output = "ilights:light_on 3",
 	recipe = {
-		{ "",                     "default:steel_ingot",  "" },
-		{ "",                     "default:glass",        "" },
-		{ "default:steel_ingot",  "default:torch",        "default:steel_ingot" }
+		{ "", mat.steel_ingot, "" },
+		{ "", mat.glass, "" },
+		{ mat.steel_ingot, mat.torch, mat.steel_ingot }
 	},
 })
 
@@ -214,9 +215,9 @@ unifieddyes.register_color_craft({
 	palette = "wallmounted",
 	neutral_node = "",
 	recipe = {
-		{ "",                     "default:steel_ingot",  ""                    },
-		{ "",                     "default:glass",        "MAIN_DYE"            },
-		{ "default:steel_ingot",  "default:torch",        "default:steel_ingot" }
+		{ "", mat.steel_ingot, ""},
+		{ "", mat.glass, "MAIN_DYE" },
+		{ mat.steel_ingot, mat.torch, mat.steel_ingot }
 	}
 })
 
