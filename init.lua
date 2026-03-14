@@ -3,6 +3,10 @@
 
 ilights = {}
 
+if unifieddyes and not unifieddyes.preserve_metadata then
+	error("Incompatible version of unifieddyes found. Please update it to the latest version.")
+end
+
 local S = minetest.get_translator(minetest.get_current_modname())
 local mat = xcompat.materials
 
@@ -195,7 +199,7 @@ for _, onoff in ipairs({"on", "off"}) do
 		mesecons =      ilights.mesecons,
 		digiline =      ilights.digilines,
 		on_punch =      digiline_on_punch,
-		on_dig = unifieddyes.on_dig,
+		preserve_metadata = unifieddyes.preserve_metadata,
 	})
 end
 
