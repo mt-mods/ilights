@@ -3,43 +3,47 @@
 
 ilights = {}
 
-local S = minetest.get_translator(minetest.get_current_modname())
+if unifieddyes and not unifieddyes.preserve_metadata then
+	error("Incompatible version of unifieddyes found. Please update it to the latest version.")
+end
+
+local S = core.get_translator(core.get_current_modname())
 local mat = xcompat.materials
 
-if minetest.get_modpath("unified_inventory") or not minetest.settings:get_bool("creative_mode") then
+if core.get_modpath("unified_inventory") or not core.settings:get_bool("creative_mode") then
 	ilights.expect_infinite_stacks = false
 else
 	ilights.expect_infinite_stacks = true
 end
 
-ilights.modpath = minetest.get_modpath("ilights")
+ilights.modpath = core.get_modpath("ilights")
 
 local function is_protected(pos, clicker)
-	if minetest.is_protected(pos, clicker:get_player_name()) then
-		minetest.record_protection_violation(pos,
+	if core.is_protected(pos, clicker:get_player_name()) then
+		core.record_protection_violation(pos,
 		clicker:get_player_name())
 		return true
 	end
 	return false
 end
 
-if minetest.get_modpath("mesecons") then
+if core.get_modpath("mesecons") then
 	actions = {
 		action_off = function(pos, node)
 			local sep = string.find(node.name, "_", -5)
 			local onoff = string.sub(node.name, sep + 1)
-			if minetest.get_meta(pos):get_int("toggled") > 0 then
-				minetest.swap_node(pos, {
+			if core.get_meta(pos):get_int("toggled") > 0 then
+				core.swap_node(pos, {
 					name = string.sub(node.name, 1, sep - 1).."_off",
 					param2 = node.param2
 				})
 			end
 		end,
 		action_on = function(pos, node)
-			minetest.get_meta(pos):set_int("toggled", 1)
+			core.get_meta(pos):set_int("toggled", 1)
 			local sep = string.find(node.name, "_", -5)
 			local onoff = string.sub(node.name, sep + 1)
-			minetest.swap_node(pos, {
+			core.swap_node(pos, {
 				name = string.sub(node.name, 1, sep - 1).."_on",
 				param2 = node.param2
 			})
@@ -68,10 +72,10 @@ local onoff_tab = {
 	["on"] = "on",
 }
 
-if minetest.get_modpath("digilines") then
+if core.get_modpath("digilines") then
 
 	local on_digiline_receive_string = function(pos, node, channel, msg)
-		local meta = minetest.get_meta(pos)
+		local meta = core.get_meta(pos)
 		local setchan = meta:get_string("channel")
 
 		if setchan ~= channel then return end
@@ -84,26 +88,26 @@ if minetest.get_modpath("digilines") then
 			local light = onoff_tab[msg]
 			if light then
 				local basename = string.sub(node.name, 1, string.find(node.name, "_", -5) - 1)
-				if minetest.registered_nodes[basename.."_"..light] then
-					minetest.swap_node(pos, {name = basename.."_"..light, param2 = node.param2})
+				if core.registered_nodes[basename.."_"..light] then
+					core.swap_node(pos, {name = basename.."_"..light, param2 = node.param2})
 				end
 			end
 		end
 	end
 
-	minetest.register_on_player_receive_fields(function(player, formname, fields)
+	core.register_on_player_receive_fields(function(player, formname, fields)
 		local name = player:get_player_name()
 		local pos = player_last_clicked[name]
 		if pos and formname == "ilights:set_channel" then
 			if is_protected(pos, player) then return end
 			if (fields.channel) then
-				local meta = minetest.get_meta(pos)
+				local meta = core.get_meta(pos)
 				meta:set_string("channel", fields.channel)
 			end
 		end
 	end)
 
-	if minetest.get_modpath("mesecons") then
+	if core.get_modpath("mesecons") then
 		ilights.digilines = {
 			effector = {
 				action = on_digiline_receive_string,
@@ -129,12 +133,12 @@ if minetest.get_modpath("digilines") then
 		if puncher:get_player_control().sneak then
 			local name = puncher:get_player_name()
 			player_last_clicked[name] = pos
-			local meta = minetest.get_meta(pos)
+			local meta = core.get_meta(pos)
 			local form = "formspec_version[4]"..
 					"size[8,4]"..
 					"button_exit[3,2.5;2,0.5;proceed;Proceed]"..
 					"field[1.75,1.5;4.5,0.5;channel;Channel;]"
-			minetest.show_formspec(name, "ilights:set_channel", form)
+			core.show_formspec(name, "ilights:set_channel", form)
 		end
 	end
 end
@@ -146,7 +150,7 @@ function ilights.toggle_light(pos, node, clicker, itemstack, pointed_thing)
 	local sep = string.find(node.name, "_o", -5)
 	local onoff = string.sub(node.name, sep + 1)
 	local newname = string.sub(node.name, 1, sep - 1)..((onoff == "off") and "_on" or "_off")
-	minetest.swap_node(pos, {name = newname, param2 = node.param2})
+	core.swap_node(pos, {name = newname, param2 = node.param2})
 end
 
 -- The important stuff!
@@ -160,10 +164,10 @@ local lamp_cbox = {
 
 for _, onoff in ipairs({"on", "off"}) do
 
-	local light_source = (onoff == "on") and minetest.LIGHT_MAX or nil
+	local light_source = (onoff == "on") and core.LIGHT_MAX or nil
 	local nici = (onoff == "off") and 1 or nil
 
-	minetest.register_node("ilights:light_"..onoff, {
+	core.register_node("ilights:light_"..onoff, {
 		description = "Industrial Light",
 		drawtype = "mesh",
 		mesh = "ilights_lamp.obj",
@@ -195,13 +199,13 @@ for _, onoff in ipairs({"on", "off"}) do
 		mesecons =      ilights.mesecons,
 		digiline =      ilights.digilines,
 		on_punch =      digiline_on_punch,
-		on_dig = unifieddyes.on_dig,
+		preserve_metadata = unifieddyes.preserve_metadata,
 	})
 end
 
-minetest.register_alias("ilights:light", "ilights:light_on")
+core.register_alias("ilights:light", "ilights:light_on")
 
-minetest.register_craft({
+core.register_craft({
 	output = "ilights:light_on 3",
 	recipe = {
 		{ "", mat.steel_ingot, "" },
@@ -258,7 +262,7 @@ for _, i in ipairs (ilights.colors) do
 	table.insert(ilights.old_static_nodes, "ilights:light_"..i)
 end
 
-minetest.register_lbm({
+core.register_lbm({
 	name = "ilights:convert",
 	label = "Convert ilights static nodes to use param2 color",
 	run_at_every_load = false,
@@ -285,8 +289,8 @@ minetest.register_lbm({
 		end
 		param2 = paletteidx + new_fdir
 
-		minetest.set_node(pos, { name = "ilights:light", param2 = param2 })
-		local meta = minetest.get_meta(pos)
+		core.set_node(pos, { name = "ilights:light", param2 = param2 })
+		local meta = core.get_meta(pos)
 		meta:set_string("dye", "unifieddyes:"..color)
 	end
 })
