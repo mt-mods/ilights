@@ -7,8 +7,10 @@ if unifieddyes and not unifieddyes.preserve_metadata then
 	error("Incompatible version of unifieddyes found. Please update it to the latest version.")
 end
 
-local S = core.get_translator(core.get_current_modname())
 local mat = xcompat.materials
+local rules_alldir = { { x = -1, y = 1, z = 1 }, { x = 1, y = 1, z = 1 } }
+local actions
+local new_fdir
 
 if core.get_modpath("unified_inventory") or not core.settings:get_bool("creative_mode") then
 	ilights.expect_infinite_stacks = false
@@ -20,8 +22,7 @@ ilights.modpath = core.get_modpath("ilights")
 
 local function is_protected(pos, clicker)
 	if core.is_protected(pos, clicker:get_player_name()) then
-		core.record_protection_violation(pos,
-		clicker:get_player_name())
+		core.record_protection_violation(pos, clicker:get_player_name())
 		return true
 	end
 	return false
@@ -31,27 +32,25 @@ if core.get_modpath("mesecons") then
 	actions = {
 		action_off = function(pos, node)
 			local sep = string.find(node.name, "_", -5)
-			local onoff = string.sub(node.name, sep + 1)
 			if core.get_meta(pos):get_int("toggled") > 0 then
 				core.swap_node(pos, {
-					name = string.sub(node.name, 1, sep - 1).."_off",
-					param2 = node.param2
+					name = string.sub(node.name, 1, sep - 1) .. "_off",
+					param2 = node.param2,
 				})
 			end
 		end,
 		action_on = function(pos, node)
 			core.get_meta(pos):set_int("toggled", 1)
 			local sep = string.find(node.name, "_", -5)
-			local onoff = string.sub(node.name, sep + 1)
 			core.swap_node(pos, {
-				name = string.sub(node.name, 1, sep - 1).."_on",
-				param2 = node.param2
+				name = string.sub(node.name, 1, sep - 1) .. "_on",
+				param2 = node.param2,
 			})
-		end
+		end,
 	}
 
 	ilights.mesecons = {
-		effector = table.copy(actions)
+		effector = table.copy(actions),
 	}
 	ilights.mesecons.effector.rules = mesecon.rules.wallmounted_get
 end
@@ -73,13 +72,14 @@ local onoff_tab = {
 }
 
 if core.get_modpath("digilines") then
-
 	local on_digiline_receive_string = function(pos, node, channel, msg)
 		local meta = core.get_meta(pos)
 		local setchan = meta:get_string("channel")
 
-		if setchan ~= channel then return end
-		if msg ~= "" and (type(msg) == "string" or type(msg) == "number" ) then
+		if setchan ~= channel then
+			return
+		end
+		if msg ~= "" and (type(msg) == "string" or type(msg) == "number") then
 			local n = tonumber(msg)
 			if n then
 				msg = (n > 3) and "on" or "off" -- same threshold as in homedecor's lights
@@ -88,8 +88,8 @@ if core.get_modpath("digilines") then
 			local light = onoff_tab[msg]
 			if light then
 				local basename = string.sub(node.name, 1, string.find(node.name, "_", -5) - 1)
-				if core.registered_nodes[basename.."_"..light] then
-					core.swap_node(pos, {name = basename.."_"..light, param2 = node.param2})
+				if core.registered_nodes[basename .. "_" .. light] then
+					core.swap_node(pos, { name = basename .. "_" .. light, param2 = node.param2 })
 				end
 			end
 		end
@@ -99,8 +99,10 @@ if core.get_modpath("digilines") then
 		local name = player:get_player_name()
 		local pos = player_last_clicked[name]
 		if pos and formname == "ilights:set_channel" then
-			if is_protected(pos, player) then return end
-			if (fields.channel) then
+			if is_protected(pos, player) then
+				return
+			end
+			if fields.channel then
 				local meta = core.get_meta(pos)
 				meta:set_string("channel", fields.channel)
 			end
@@ -113,8 +115,8 @@ if core.get_modpath("digilines") then
 				action = on_digiline_receive_string,
 			},
 			wire = {
-				rules = mesecon.rules.wallmounted_get
-			}
+				rules = mesecon.rules.wallmounted_get,
+			},
 		}
 	else
 		ilights.digilines = {
@@ -122,22 +124,23 @@ if core.get_modpath("digilines") then
 				action = on_digiline_receive_string,
 			},
 			wire = {
-				rules = rules_alldir
-			}
+				rules = rules_alldir,
+			},
 		}
 	end
 
 	function digiline_on_punch(pos, node, puncher, pointed_thing)
-		if is_protected(pos, puncher) then return end
+		if is_protected(pos, puncher) then
+			return
+		end
 
 		if puncher:get_player_control().sneak then
 			local name = puncher:get_player_name()
 			player_last_clicked[name] = pos
-			local meta = core.get_meta(pos)
-			local form = "formspec_version[4]"..
-					"size[8,4]"..
-					"button_exit[3,2.5;2,0.5;proceed;Proceed]"..
-					"field[1.75,1.5;4.5,0.5;channel;Channel;]"
+			local form = "formspec_version[4]"
+				.. "size[8,4]"
+				.. "button_exit[3,2.5;2,0.5;proceed;Proceed]"
+				.. "field[1.75,1.5;4.5,0.5;channel;Channel;]"
 			core.show_formspec(name, "ilights:set_channel", form)
 		end
 	end
@@ -146,40 +149,41 @@ end
 -- turn on/off
 
 function ilights.toggle_light(pos, node, clicker, itemstack, pointed_thing)
-	if is_protected(pos, clicker) then return end
+	if is_protected(pos, clicker) then
+		return
+	end
 	local sep = string.find(node.name, "_o", -5)
 	local onoff = string.sub(node.name, sep + 1)
-	local newname = string.sub(node.name, 1, sep - 1)..((onoff == "off") and "_on" or "_off")
-	core.swap_node(pos, {name = newname, param2 = node.param2})
+	local newname = string.sub(node.name, 1, sep - 1) .. ((onoff == "off") and "_on" or "_off")
+	core.swap_node(pos, { name = newname, param2 = node.param2 })
 end
 
 -- The important stuff!
 
 local lamp_cbox = {
 	type = "wallmounted",
-	wall_top =    { -11/32,  -4/16, -11/32, 11/32,  8/16, 11/32 },
-	wall_bottom = { -11/32,  -8/16, -11/32, 11/32,  4/16, 11/32 },
-	wall_side =   {  -8/16, -11/32, -11/32,  4/16, 11/32, 11/32 }
+	wall_top = { -11 / 32, -4 / 16, -11 / 32, 11 / 32, 8 / 16, 11 / 32 },
+	wall_bottom = { -11 / 32, -8 / 16, -11 / 32, 11 / 32, 4 / 16, 11 / 32 },
+	wall_side = { -8 / 16, -11 / 32, -11 / 32, 4 / 16, 11 / 32, 11 / 32 },
 }
 
-for _, onoff in ipairs({"on", "off"}) do
-
+for _, onoff in ipairs({ "on", "off" }) do
 	local light_source = (onoff == "on") and core.LIGHT_MAX or nil
 	local nici = (onoff == "off") and 1 or nil
 
-	core.register_node("ilights:light_"..onoff, {
+	core.register_node("ilights:light_" .. onoff, {
 		description = "Industrial Light",
 		drawtype = "mesh",
 		mesh = "ilights_lamp.obj",
 		tiles = {
 			{ name = "ilights_lamp_base.png", color = 0xffffffff },
 			{ name = "ilights_lamp_cage.png", color = 0xffffffff },
-			"ilights_lamp_bulb_"..onoff..".png",
+			"ilights_lamp_bulb_" .. onoff .. ".png",
 			{ name = "ilights_lamp_bulb_base.png", color = 0xffffffff },
-			"ilights_lamp_lens_"..onoff..".png"
+			"ilights_lamp_lens_" .. onoff .. ".png",
 		},
 		use_texture_alpha = "clip",
-		groups = {cracky=3, ud_param2_colorable = 1, not_in_creative_inventory = nici},
+		groups = { cracky = 3, ud_param2_colorable = 1, not_in_creative_inventory = nici },
 		is_ground_content = false,
 		paramtype = "light",
 		paramtype2 = "colorwallmounted",
@@ -192,13 +196,13 @@ for _, onoff in ipairs({"on", "off"}) do
 		end,
 		drop = {
 			items = {
-				{items = {"ilights:light_on"}, inherit_color = true },
-			}
+				{ items = { "ilights:light_on" }, inherit_color = true },
+			},
 		},
 		on_rightclick = ilights.toggle_light,
-		mesecons =      ilights.mesecons,
-		digiline =      ilights.digilines,
-		on_punch =      digiline_on_punch,
+		mesecons = ilights.mesecons,
+		digiline = ilights.digilines,
+		on_punch = digiline_on_punch,
 		preserve_metadata = unifieddyes.preserve_metadata,
 	})
 end
@@ -210,7 +214,7 @@ core.register_craft({
 	recipe = {
 		{ "", mat.steel_ingot, "" },
 		{ "", mat.glass, "" },
-		{ mat.steel_ingot, mat.torch, mat.steel_ingot }
+		{ mat.steel_ingot, mat.torch, mat.steel_ingot },
 	},
 })
 
@@ -219,10 +223,10 @@ unifieddyes.register_color_craft({
 	palette = "wallmounted",
 	neutral_node = "",
 	recipe = {
-		{ "", mat.steel_ingot, ""},
+		{ "", mat.steel_ingot, "" },
 		{ "", mat.glass, "MAIN_DYE" },
-		{ mat.steel_ingot, mat.torch, mat.steel_ingot }
-	}
+		{ mat.steel_ingot, mat.torch, mat.steel_ingot },
+	},
 })
 
 unifieddyes.register_color_craft({
@@ -233,7 +237,7 @@ unifieddyes.register_color_craft({
 	recipe = {
 		"NEUTRAL_NODE",
 		"MAIN_DYE",
-	}
+	},
 })
 
 -- convert old static nodes to param2 coloring
@@ -253,13 +257,13 @@ ilights.colors = {
 	"dark_grey",
 	"dark_green",
 	"pink",
-	"brown"
+	"brown",
 }
 
 ilights.old_static_nodes = {}
 
-for _, i in ipairs (ilights.colors) do
-	table.insert(ilights.old_static_nodes, "ilights:light_"..i)
+for _, i in ipairs(ilights.colors) do
+	table.insert(ilights.old_static_nodes, "ilights:light_" .. i)
 end
 
 core.register_lbm({
@@ -270,7 +274,7 @@ core.register_lbm({
 	action = function(pos, node)
 		local name = node.name
 		local color = string.sub(name, string.find(name, "_") + 1)
-		local paletteidx = unifieddyes.getpaletteidx("unifieddyes:"..color, "wallmounted")
+		local paletteidx = unifieddyes.getpaletteidx("unifieddyes:" .. color, "wallmounted")
 		local old_fdir = math.floor(node.param2 / 4)
 		local param2
 
@@ -291,6 +295,6 @@ core.register_lbm({
 
 		core.set_node(pos, { name = "ilights:light", param2 = param2 })
 		local meta = core.get_meta(pos)
-		meta:set_string("dye", "unifieddyes:"..color)
-	end
+		meta:set_string("dye", "unifieddyes:" .. color)
+	end,
 })
