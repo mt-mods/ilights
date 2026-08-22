@@ -11,6 +11,8 @@ local mat = xcompat.materials
 local rules_alldir = { { x = -1, y = 1, z = 1 }, { x = 1, y = 1, z = 1 } }
 local actions
 local new_fdir
+local S = core.get_translator(core.get_current_modname())
+local FE = core.formspec_escape
 
 if core.get_modpath("unified_inventory") or not core.settings:get_bool("creative_mode") then
 	ilights.expect_infinite_stacks = false
@@ -139,8 +141,12 @@ if core.get_modpath("digilines") then
 			player_last_clicked[name] = pos
 			local form = "formspec_version[4]"
 				.. "size[8,4]"
-				.. "button_exit[3,2.5;2,0.5;proceed;Proceed]"
-				.. "field[1.75,1.5;4.5,0.5;channel;Channel;]"
+				.. "button_exit[3,2.5;2,0.5;proceed;"
+				.. FE(S("Proceed"))
+				.. "]"
+				.. "field[1.75,1.5;4.5,0.5;channel;"
+				.. FE(S("Channel"))
+				.. ";]"
 			core.show_formspec(name, "ilights:set_channel", form)
 		end
 	end
@@ -172,7 +178,7 @@ for _, onoff in ipairs({ "on", "off" }) do
 	local nici = (onoff == "off") and 1 or nil
 
 	core.register_node("ilights:light_" .. onoff, {
-		description = "Industrial Light",
+		description = S("Industrial Light"),
 		drawtype = "mesh",
 		mesh = "ilights_lamp.obj",
 		tiles = {
