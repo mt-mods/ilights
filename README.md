@@ -1,7 +1,9 @@
 # Industrial Lights
 
-[![ContentDB](content.luanti.org/packages/mt-mods/ilights//shields/downloads/)](content.luanti.org/packages/mt-mods/ilights/)
+[![ContentDB](content.luanti.org/packages/mt-mods/ilights/shields/downloads/)](content.luanti.org/packages/mt-mods/ilights/)
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+[![Luacheck](https://github.com/mt-mods/ilights/actions/workflows/luacheck.yml/badge.svg)](https://github.com/mt-mods/ilights/actions/workflows/luacheck.yml)
+[![Translation status](https://translate.luanti.ch/widget/mt-mods/ilights/svg-badge.svg?capitalize=1)](https://translate.luanti.ch/engage/mt-mods/)
 
 A simple industrial light.
 
